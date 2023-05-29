@@ -1,0 +1,70 @@
+<html>
+    <head>
+        <title>主窗口</title>
+    </head>
+    <body>
+        <h1>hello world</h1>
+        <div><button id="openDevToolsBtn">打开开发者工具</button></div>
+        <div><button id="makeNewWindow">创建新窗口</button></div>
+        <div><button id="makeNewWindow2">创建新窗口2</button></div>
+        <div><button id="sendMsg">发送消息</button></div>
+    </body>
+</html>
+<script>
+    // remote 对象的属性和方法是猪进程的属性和方法的映射，对其通过 remote 访问时，electron 会构造消息通知主进程，再将主进程的计算结果通过远程对象返回给渲染进程。
+    const remote = require('@electron/remote')
+    console.log('remote', remote) 
+
+    // 打开调试工具
+    document.querySelector("#openDevToolsBtn").addEventListener('click', function() {
+        remote.getCurrentWindow().webContents.openDevTools()
+    })
+
+    // 通过 remote 创建新窗口
+    let win = null;
+    document.querySelector("#makeNewWindow").addEventListener('click', function() {
+        win = new remote.BrowserWindow({
+            webPreferences: { nodeIntegration: true }
+        });
+        win.loadFile('index.html');
+    })
+
+    // 这里使用了 remote.require 来加载 mainModel，因而创建窗口的逻辑实际上是在主进程中执行的
+    // 因为渲染进程不能直接访问 BrowserWindow，直接使用 require 加载会提示错误：BrowserWindow is not a constructor
+    let mainModel = remote.require('./mainModel')
+    let renderWin = null
+    document.querySelector("#makeNewWindow2").addEventListener('click', function() {
+        renderWin = mainModel.makeWindow()
+        renderWin.loadFile('index.html');
+    })
+
+    const { ipcRenderer } = require('electron')
+    console.log('ipcRenderer', ipcRenderer)
+    document.querySelector('#sendMsg').addEventListener('click', () => {
+        // 通过 ipcRenderer.send 向主进程发送异步消息
+        ipcRenderer.send('msg_render2main', {name: 'param1'}, {name: 'param2'})
+
+        // 通过 ipcRenderer.sendSync 发送同步消息会阻塞渲染进程，可能会导致预期外的问题，须谨慎使用
+        // returnValue 为主进程返回值，同步消息无需设置监听
+        let returnValue = ipcRenderer.sendSync('msg_render2main', {  name: 'param1' }, { name: 'param2' });
+
+        // 如果知道其他渲染窗口的 webContents 的 id，则可以直接用 ipcRenderer.sendTo 发送消息，而无需从主进程中转
+        // win1窗口发送消息的代码
+        // document.querySelector("#sendMsg2").addEventListener('click', _ => {
+        //     ipcRenderer.sendTo(win2.webContents.id, 'msg_render2render', { name: 'param1' }, { name: 'param2'
+        //     })
+        // });
+        // // win2窗口接收消息的代码
+        // ipcRenderer.on('msg_render2render', (event, param1, param2) => {
+        //     console.log(param1);
+        //     console.log(param2);
+        //     console.log(event.sender);
+        // });
+    })
+    // 通过 ipcRenderer 接收主进程的消息
+    ipcRenderer.on('msg_main2render', (event, param1, param2) => {
+        console.log(param1);
+        console.log(param2);
+        console.log(event.sender);
+    });
+</script>

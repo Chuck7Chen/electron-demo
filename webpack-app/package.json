@@ -1,0 +1,19 @@
+{
+  "name": "electron-webpack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ./index.js",
+    "dev": "electron-webpack dev",
+    "build": "electron-webpack build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^24.3.1",
+    "electron-webpack": "^2.8.2",
+    "webpack": "^4.46.0"
+  }
+}
