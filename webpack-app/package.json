@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "electron ./index.js",
     "dev": "electron-webpack dev",
     "build": "electron-webpack build",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -14,6 +13,12 @@
   "devDependencies": {
     "electron": "^24.3.1",
     "electron-webpack": "^2.8.2",
-    "webpack": "^4.46.0"
+    "webpack": "^4.46.0",
+    "webpack-cli": "^3.3.11"
+  },
+  "electronWebpack": {
+    "renderer": {
+        "template": "src/renderer/index.html"
+    }
   }
 }

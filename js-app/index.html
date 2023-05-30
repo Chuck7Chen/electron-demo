@@ -11,7 +11,7 @@
     </body>
 </html>
 <script>
-    // remote 对象的属性和方法是猪进程的属性和方法的映射，对其通过 remote 访问时，electron 会构造消息通知主进程，再将主进程的计算结果通过远程对象返回给渲染进程。
+    // remote 对象的属性和方法是主进程的属性和方法的映射，对其通过 remote 访问时，electron 会构造消息通知主进程，再将主进程的计算结果通过远程对象返回给渲染进程。
     const remote = require('@electron/remote')
     console.log('remote', remote) 
 
